@@ -48,7 +48,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
 
-    update_data()
+    updated_data = update_data()
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
     logging.info('Data updated: %s', data)
