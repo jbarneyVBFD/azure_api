@@ -41,14 +41,17 @@ def update_data():
         logging.error(f"An error occurred: {e}")
         return None
 
-def main(mytimer: func.TimerRequest) -> None:
-    utc_timestamp = datetime.datetime.utcnow().replace(
-        tzinfo=datetime.timezone.utc).isoformat()
-
-    if mytimer.past_due:
-        logging.info('The timer is past due!')
-
-    updated_data = update_data()
-
-    logging.info('Python timer trigger function ran at %s', utc_timestamp)
-    logging.info('Data updated: %s', data)
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        updated_data = update_data()
+        return func.HttpResponse(
+            body=str(updated_data),
+            status_code=200,
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return func.HttpResponse(
+            "Error updating data",
+            status_code=500
+        )
