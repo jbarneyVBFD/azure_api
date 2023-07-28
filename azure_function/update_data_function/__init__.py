@@ -2,6 +2,19 @@ import datetime
 import logging
 import numpy as np
 import azure.functions as func
+from azure.data.tables import TableClient, TableEntity
+from decouple import config
+
+account_name = config('AZURE_STORAGE_ACCOUNT_NAME')
+account_key = config('AZURE_STORAGE_ACCOUNT_KEY')
+table_endpoint = config('AZURE_STORAGE_TABLE_ENDPOINT')
+
+connection_string = (f"DefaultEndpointsProtocol=https;"
+                         f"AccountName={account_name};"
+                         f"AccountKey={account_key};"
+                         f"TableEndpoint={table_endpoint};")
+
+table_client = TableClient.from_connection_string(connection_string, table_name="SensorData")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -49,6 +62,17 @@ def main(mytimer: func.TimerRequest) -> None:
         logging.info('The timer is past due!')
 
     updated_data = update_data()
+
+    # Store data in Azure Table Storage
+    data_entity = TableEntity(
+        PartitionKey='SensorReadings',
+        RowKey=utc_timestamp,  # Using the timestamp as RowKey to ensure uniqueness
+        Temperature=updated_data["temperature"],
+        PHBalance=updated_data["ph_balance"],
+        Salinity=updated_data["salinity"],
+        DissolvedOxygen=updated_data["dissolved_oxygen"]
+    )
+    table_client.create_entity(entity=data_entity)
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
     logging.info('Data updated: %s', updated_data)
