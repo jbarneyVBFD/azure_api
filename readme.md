@@ -18,8 +18,8 @@ The Azure Function fetches sensor data, which includes metrics like temperature,
 1. **Clone the Repository**
 
     ```bash
-    git clone [repository-url]
-    cd [repository-name]
+    git clone https://github.com/jbarneyVBFD/azure_api
+    cd azure_api
 
 2. **Set up a Virtual Environment (optional but recommended)**
 
